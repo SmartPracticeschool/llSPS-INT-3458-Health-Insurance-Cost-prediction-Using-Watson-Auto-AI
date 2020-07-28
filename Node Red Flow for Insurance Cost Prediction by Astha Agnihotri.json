@@ -1,0 +1,313 @@
+[
+    {
+        "id": "a08cfdfd.9c15c",
+        "type": "tab",
+        "label": "Node Red Flow (Heath Insurance)",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "32eec9a3.2ec786",
+        "type": "function",
+        "z": "a08cfdfd.9c15c",
+        "name": "Token",
+        "func": "global.set(\"ag\",msg.payload.ag)\nglobal.set(\"se\",msg.payload.se)\nglobal.set(\"bm\",msg.payload.bm)\nglobal.set(\"ch\",msg.payload.ch)\nglobal.set(\"sm\",msg.payload.sm)\nglobal.set(\"re\",msg.payload.re)\nvar apikey=\"-S_4NIm6y-Fq6o_hGPthLtTQJ5YIlMAHafmBZoyq6Duf\";\nmsg.headers={\"content-type\":\"application/x-www-form-urlencoded\"}\nmsg.payload={\"grant_type\":\"urn:ibm:params:oauth:grant-type:apikey\",\"apikey\":apikey}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 310,
+        "y": 360,
+        "wires": [
+            [
+                "7a7a8799.3ddd68"
+            ]
+        ]
+    },
+    {
+        "id": "c71df6ab.37f998",
+        "type": "function",
+        "z": "a08cfdfd.9c15c",
+        "name": "Prediction",
+        "func": "var ag = global.get('ag')\nvar se = global.get('se')\nvar bm = global.get('bm')\nvar ch = global.get('ch')\nvar sm = global.get('sm')\nvar re = global.get('re')\nvar token=msg.payload.access_token\nvar instance_id=\"fd9174f3-36e8-410a-85fc-af84dca751dc\"\nmsg.headers={'Content-Type': 'application/json',\"Authorization\":\"Bearer \"+token,\"ML-Instance-ID\":instance_id}\nmsg.payload={\"input_data\": [{\"fields\": [\"age\",\"sex\",\"bmi\",\"children\",\"smoker\",\"region\"], \"values\": [[ag,se,bm,ch,sm,re]]}]}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 580,
+        "y": 360,
+        "wires": [
+            [
+                "7058974d.74b668"
+            ]
+        ]
+    },
+    {
+        "id": "10541bcc.3e67f4",
+        "type": "ui_form",
+        "z": "a08cfdfd.9c15c",
+        "name": "",
+        "label": "",
+        "group": "226ab9e3.c1d0b6",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "options": [
+            {
+                "label": "Age",
+                "value": "ag",
+                "type": "number",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Sex",
+                "value": "se",
+                "type": "text",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "BMI",
+                "value": "bm",
+                "type": "number",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "No of Children",
+                "value": "ch",
+                "type": "number",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Smoker (Yes/No)",
+                "value": "sm",
+                "type": "text",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Region",
+                "value": "re",
+                "type": "text",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "ag": "",
+            "se": "",
+            "bm": "",
+            "ch": "",
+            "sm": "",
+            "re": ""
+        },
+        "payload": "",
+        "submit": "Submit",
+        "cancel": "cancel",
+        "topic": "",
+        "x": 130,
+        "y": 420,
+        "wires": [
+            [
+                "32eec9a3.2ec786"
+            ]
+        ]
+    },
+    {
+        "id": "c67e6022.a94f6",
+        "type": "ui_text",
+        "z": "a08cfdfd.9c15c",
+        "group": "226ab9e3.c1d0b6",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Charges:",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 940,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "7058974d.74b668",
+        "type": "http request",
+        "z": "a08cfdfd.9c15c",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://eu-gb.ml.cloud.ibm.com/v4/deployments/d4c2224c-a3f0-4964-b4b9-a84183e0bd82/predictions",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 710,
+        "y": 260,
+        "wires": [
+            [
+                "1b0a2975.04b9c7",
+                "db7f1fa2.de95d"
+            ]
+        ]
+    },
+    {
+        "id": "7a7a8799.3ddd68",
+        "type": "http request",
+        "z": "a08cfdfd.9c15c",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://iam.cloud.ibm.com/identity/token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 450,
+        "y": 260,
+        "wires": [
+            [
+                "c71df6ab.37f998"
+            ]
+        ]
+    },
+    {
+        "id": "db7f1fa2.de95d",
+        "type": "debug",
+        "z": "a08cfdfd.9c15c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "1b0a2975.04b9c7",
+        "type": "function",
+        "z": "a08cfdfd.9c15c",
+        "name": "",
+        "func": "msg.payload=msg.payload.predictions[0].values[0][0]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 840,
+        "y": 180,
+        "wires": [
+            [
+                "c67e6022.a94f6"
+            ]
+        ]
+    },
+    {
+        "id": "ba7d02f4.562b3",
+        "type": "inject",
+        "z": "a08cfdfd.9c15c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 260,
+        "wires": [
+            [
+                "32eec9a3.2ec786",
+                "5369ebe4.e9b7f4",
+                "30cb47b4.8ee928",
+                "c2908534.b032d8"
+            ]
+        ]
+    },
+    {
+        "id": "5369ebe4.e9b7f4",
+        "type": "ui_text",
+        "z": "a08cfdfd.9c15c",
+        "group": "226ab9e3.c1d0b6",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "",
+        "format": "*actual charges may vary based on other factors",
+        "layout": "col-center",
+        "x": 310,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "30cb47b4.8ee928",
+        "type": "ui_text",
+        "z": "a08cfdfd.9c15c",
+        "group": "226ab9e3.c1d0b6",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Developed  by:",
+        "format": " Astha Agnihotri",
+        "layout": "col-center",
+        "x": 340,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "c2908534.b032d8",
+        "type": "ui_text",
+        "z": "a08cfdfd.9c15c",
+        "group": "226ab9e3.c1d0b6",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "",
+        "format": "(RSIP Career Basic ML 178)",
+        "layout": "col-center",
+        "x": 310,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "226ab9e3.c1d0b6",
+        "type": "ui_group",
+        "z": "",
+        "name": "Predict cost of your Insurance",
+        "tab": "8112c32a.deb19",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "8112c32a.deb19",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Health Insurance Cost Predictor",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
